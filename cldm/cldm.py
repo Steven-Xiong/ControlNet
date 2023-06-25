@@ -168,7 +168,7 @@ class ControlNet(nn.Module):
         ds = 1
         for level, mult in enumerate(channel_mult):
             for nr in range(self.num_res_blocks[level]):
-                layers = [
+                layers = [                       #TODO 改为SDMResBlock类似的多输入
                     ResBlock(
                         ch,
                         time_embed_dim,
@@ -247,7 +247,7 @@ class ControlNet(nn.Module):
             # num_heads = 1
             dim_head = ch // num_heads if use_spatial_transformer else num_head_channels
         self.middle_block = TimestepEmbedSequential(
-            ResBlock(
+            ResBlock(                  #TODO 改为SDMResBlock类似的多输入
                 ch,
                 time_embed_dim,
                 dropout,

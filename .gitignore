@@ -3,6 +3,9 @@
 training/
 lightning_logs/
 image_log/
+data
+models/
+__pycache__
 
 *.pth
 *.pt
