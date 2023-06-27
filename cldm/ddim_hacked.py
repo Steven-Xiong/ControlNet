@@ -77,6 +77,7 @@ class DDIMSampler(object):
                ucg_schedule=None,
                **kwargs
                ):
+        #import pdb; pdb.set_trace()
         if conditioning is not None:
             if isinstance(conditioning, dict):
                 ctmp = conditioning[list(conditioning.keys())[0]]

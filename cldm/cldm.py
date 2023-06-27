@@ -351,17 +351,17 @@ class ControlLDM(LatentDiffusion):
                    use_ema_scope=True,
                    **kwargs):
         use_ddim = ddim_steps is not None
-
+        #import pdb; pdb.set_trace()
         log = dict()
         z, c = self.get_input(batch, self.first_stage_key, bs=N)
         c_cat, c = c["c_concat"][0][:N], c["c_crossattn"][0][:N]
         N = min(z.shape[0], N)
         n_row = min(z.shape[0], n_row)
-        log["reconstruction"] = self.decode_first_stage(z)
-        log["control"] = c_cat * 2.0 - 1.0
-        log["conditioning"] = log_txt_as_img((512, 512), batch[self.cond_stage_key], size=16)
+        log["reconstruction"] = self.decode_first_stage(z)          # shape [4, 3, 512, 128]
+        log["control"] = c_cat * 2.0 - 1.0                          # shape [4, 3, 512, 128]
+        log["conditioning"] = log_txt_as_img((512, 512), batch[self.cond_stage_key], size=16) # [4, 3, 512, 512
 
-        if plot_diffusion_rows:
+        if plot_diffusion_rows: #不走
             # get diffusion row
             diffusion_row = list()
             z_start = z[:n_row]
@@ -379,7 +379,7 @@ class ControlLDM(LatentDiffusion):
             diffusion_grid = make_grid(diffusion_grid, nrow=diffusion_row.shape[0])
             log["diffusion_row"] = diffusion_grid
 
-        if sample:
+        if sample:   #不走
             # get denoise row
             samples, z_denoise_row = self.sample_log(cond={"c_concat": [c_cat], "c_crossattn": [c]},
                                                      batch_size=N, ddim=use_ddim,
@@ -390,7 +390,7 @@ class ControlLDM(LatentDiffusion):
                 denoise_grid = self._get_denoise_row_from_list(z_denoise_row)
                 log["denoise_row"] = denoise_grid
 
-        if unconditional_guidance_scale > 1.0:
+        if unconditional_guidance_scale > 1.0:    # 9.0
             uc_cross = self.get_unconditional_conditioning(N)
             uc_cat = c_cat  # torch.zeros_like(c_cat)
             uc_full = {"c_concat": [uc_cat], "c_crossattn": [uc_cross]}
@@ -399,8 +399,8 @@ class ControlLDM(LatentDiffusion):
                                              ddim_steps=ddim_steps, eta=ddim_eta,
                                              unconditional_guidance_scale=unconditional_guidance_scale,
                                              unconditional_conditioning=uc_full,
-                                             )
-            x_samples_cfg = self.decode_first_stage(samples_cfg)
+                                             )  #samples_cfg shape: [4,4,64,16]
+            x_samples_cfg = self.decode_first_stage(samples_cfg)  # [4, 3, 512, 128] latent空间解回来
             log[f"samples_cfg_scale_{unconditional_guidance_scale:.2f}"] = x_samples_cfg
 
         return log

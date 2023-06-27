@@ -59,7 +59,7 @@ def pil_loader(path):
 
 # for flow condition
 class FlowbpsDataset(Dataset):
-    def __init__(self, data_root, data_flist, data_len=-1, image_size=[128, 512], loader=pil_loader):
+    def __init__(self, data_root, data_flist, data_len=-1, image_size=[512, 128], loader=pil_loader):
         self.data_root = data_root
         flist = make_dataset(data_flist)
         if data_len > 0:
@@ -79,9 +79,9 @@ class FlowbpsDataset(Dataset):
         file_name = str(self.flist[index])
         file_name1 = str(self.flist[index]).replace('.jpg','.png')
 
-        img = self.tfs(self.loader('{}/{}/{}'.format(self.data_root, 'images', file_name)))
+        #img = self.tfs(self.loader('{}/{}/{}'.format(self.data_root, 'images', file_name)))
         #cond_image = self.tfs(self.loader('{}/{}/{}'.format(self.data_root, 'gray', file_name)))
-        cond_image = self.tfs(self.loader('{}/{}/{}'.format(self.data_root, 'images_out', file_name1)))
+        #cond_image = self.tfs(self.loader('{}/{}/{}'.format(self.data_root, 'images_out', file_name1)))
         
         source = cv2.imread(os.path.join(self.data_root, 'images', file_name))
         target = cv2.imread(os.path.join(self.data_root, 'images_out', file_name1))
@@ -98,10 +98,11 @@ class FlowbpsDataset(Dataset):
         target = (target.astype(np.float32) / 127.5) - 1.0
 
 
-        ret['gt_image'] = img
-        ret['cond_image'] = cond_image
-        ret['path'] = file_name
-        return dict(jpg=target, txt='a high resolution streetview image', hint=source)
+        # ret['gt_image'] = img
+        # ret['cond_image'] = cond_image
+        # ret['path'] = file_name
+        prompt = 'a high resolution streetview image'
+        return dict(jpg=target, txt= prompt, hint=source)
 
     def __len__(self):
         return len(self.flist)
